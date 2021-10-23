@@ -1,12 +1,10 @@
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import React, {  useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from '../hooks/useForm';
 import { GlobalContext } from '../components/ProductsProvider';
 import '../styles/auth.css'
-import { firebaseConfig } from "../helpers/firebase.config";
-import { initializeApp } from "@firebase/app";
-import Spinner from 'react-bootstrap/Spinner'
+import Spinner from 'react-bootstrap/Spinner';
 import '../styles/spinner.css'
 const inistialState={
     error:null,
@@ -47,6 +45,27 @@ const Login = () => {
                         loading:false,
                     })
                 });
+    }
+
+    const  handleLoginGoogle=()=>{
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                const token = credential.accessToken;
+                const user = result.user;
+                // ...
+            }).catch((error) => {
+                // Handle Errors here.
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // The email of the user's account used.
+                const email = error.email;
+                // The AuthCredential type that was used.
+                const credential = GoogleAuthProvider.credentialFromError(error);
+                // ...
+            });    
     }
 
     if (state.loading){
@@ -107,6 +126,7 @@ const Login = () => {
                 </div>
                 <div 
                     className="google-btn"
+                    onClick={handleLoginGoogle}
                 >
                     <div className="google-icon-wrapper">
                         <img className="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="google button" />
